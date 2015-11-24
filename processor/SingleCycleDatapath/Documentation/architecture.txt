@@ -1,0 +1,387 @@
+This document serves to detail the hardware and connections required
+to for our single-cycle MIPS datapath. It also includes a complete
+listing of all commands.
+
+----------------Table of Contents--------------------
+1. List of MIPS commands
+    a. R-Type
+    b. I-Type
+    c. J-Type
+    d. Pseudo-instructions
+2. Hardware/Connections
+    a. Basic Elements
+    b. Instruction Fetch
+    c. Basic R-type instructions
+    d. LW/SW instructions
+    e. BEQ instruction
+3. Control Unit
+    a. MUXs
+    b. Table
+
+-----------------------------------------------------
+
+1. List of MIPS commands
+        Template for instruction descriptions: 
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+    a. R-Type
+    Instruction layout:
+    __________________________________________________________
+    | opcode  |   rs    |   rt    |   rd    |  shamt | funct |
+    | (31:26) | (25:21) | (20:16) | (15:11) | (10:6) | (5:0) |
+    ----------------------------------------------------------
+        ADD
+            Opcode/funct:   0x00/0x20
+            Syntax:         add rd, rs, rt
+            Operation:      R[rd] = R[rs] + R[rt]
+            Notes:
+
+        ADDU 
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SUB 
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SUBU
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        AND
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        NOR
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        OR
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        XOR
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SLL
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SRL
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SRA
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SLLV
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SRLV
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SRAV
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SLT
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        SLTU
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        JR
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        JALR
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        DIV
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        DIVU
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        MULT
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        MULTU
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        MFHI
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+        MFLO
+            Opcode/funct:   
+            Syntax:         
+            Operation:      
+            Notes:
+
+            
+
+
+    b. I-Type
+    Instruction layout: 
+    _____________________________________________
+    | opcode  |   rs    |   rt    |  immediate  |
+    | (31:26) | (25:21) | (20:16) |    (15:0)   |
+    ---------------------------------------------
+    
+    c. J-Type
+    Instruction layout: 
+    _________________________
+    | opcode  |  immediate  |
+    | (31:26) |    (25:0)   |
+    -------------------------   
+
+    d. Pseudo-Instructions
+
+2. Hardware/Connections
+        For detailing the procedural build-up of the full
+        MIPS processor, we will use the following conventions:
+
+        Hardware:
+            Here, we define new hardware required for an instruction
+            or a set of instructions by defining the interface:
+
+            Example:
+            ALU
+
+            Inputs:
+                op1(32) <-- signal_name(#_bits)
+                op2(32)
+                ALUOp(3)
+            Outputs:
+                result(32)
+                zero(1)
+
+        Connections:
+            Here, we define what needs to feed the inputs of our
+            new hardware, and where the outputs should connect.
+            In this step, we ignore any conflicts; we introduce
+            MUXs to take care of conflicts and document them in 
+            the Control Unit section
+            
+            Example:
+            ALU
+            
+            Inputs:
+                RegFile.read_data1 --> ALU.op1  <-- (Hardware.output --> Hardware.input)
+                RegFile.read_data2 --> ALU.op2
+            Outputs:
+                ALU.result --> RegFile.write_data
+
+    a. Basic Elements
+        Hardware:
+            PC Register (PC)
+                Inputs:
+                    in(32)
+                    clk
+                    clr
+                Outputs:
+                    out(32)
+
+            Register File (RegFile)
+                Inputs:
+                    read_index1(5)
+                    read_index2(5)
+                    write_index(5)
+                    write_data(32)
+                    write(1)
+                    clk
+                    clr
+                Outputs:
+                    read_data1(32)
+                    read_data2(32)
+
+            Instruction Memory (InstrMem)
+                Inputs:
+                    address(32)
+                    clk
+                    clr
+                Outputs:
+                    instr(32)
+
+            Data Memory (DataMem)
+                Inputs:
+                    address(32)
+                    write_data(32)
+                    write(1)
+                    clk
+                    clr
+                Outputs:
+                    read_data(32)
+
+    b. Instruction Fetch
+        Hardware:
+            Adder with op2 hardwire to 4 (Adder4)
+                Inputs:
+                    in(32)
+                Outputs:
+                    out(32)
+
+        Connections:
+                PC.out --> Adder4.in
+                Adder4.out --> PC.in
+                PC.out --> InstrMem.in
+
+    c. Basic R-type instructions (which subset depends on design of ALU)
+        Hardware:
+            Arithmetic Logic Unit (ALU)
+                Inputs:
+                    op1(32)
+                    op2(32)
+                    ALUOp(4)
+                Outputs:
+                    result(32)
+                    zero(1)
+        Connections:
+            InstrMem.instr[25:21] (rs) --> RegFile.read_index1
+            Instr.Mem.instr[20:26] (rt) --> RegFile.read_index2
+            RegFile.read_data1 --> ALU.op1
+            RegFile.read_data2 --> ALU.op2
+            ALU.result --> RegFile.write_data
+            InstrMem.instr[15:11] (rd) --> RegFile.write_index
+
+    d. LW/SW instructions
+        Hardware:
+            Sign Extender (SignExt)
+                Inputs:
+                    in(16)
+                Outputs:
+                    out(32)
+        Connections:
+        (Shared)
+            InstrMem.instr[25:21] (rs) --> RegFile.read_index1
+            RegFile.read_data1 --> ALU.op1
+            InstrMem.instr[15:0] (imm) --> SignExt.in
+            SignExt.out --> ALU.op2
+            ALU.result --> DataMem.op2
+        (LW only)
+            DataMem.read_data --> RegFile.write_data
+            InstrMem.instr[20:16] (rt) --> RegFile.write_index
+        (SW only)
+            InstrMem.instr[20:16] (rt) --> RegFile.read_index2
+            RegFile.read_data2 --> DataMem.write_data
+
+    e. BEQ instruction
+        Hardware:
+            Multiply by 4 by Shifting Left Twice (Mult4)
+                Inputs:
+                    in(32)
+                Outputs:
+                    out(32)
+            32-Bit Adder (Adder)
+                Inputs:
+                    op1(32)
+                    op2(32)
+                Outputs:
+                    result(32)
+
+        Connections:
+            InstrMem.instr[25:21] (rs) --> RegFile.read_index1
+            InstrMem.instr[20:16] (rt) --> RegFile.read_index2
+            RegFile.read_data1 --> ALU.op1
+            RegFile.read_data2 --> ALU.op2
+            InstrMem.instr[15:0] (offs) --> SignExt.in
+            SignExt.out --> Mult4.in
+            Mult4.out --> Adder.op1
+            Adder4.out --> Adder.op2
+            Adder.result --> PC.in
+                
+3. Control Unit
+    a. MUXs
+        PC_Branch_Mux
+            Type: 2-to-1
+            Bits: 32
+            Inputs:
+                0: Adder4.out
+                1: Adder.result
+            Output:
+                --> PC.in
+        Reg_Dest
+            Type: 2-to-1
+            Bits: 32
+            Inputs:
+                0: InstrMem.instr[20:16]
+                1: InstrMem.instr[15:11]
+            Output:
+                --> RegFile.write_index
+        ALU_Src
+            Type: 2-to-1
+            Bits: 32
+            Inputs:
+                0: RegFile.read_data2
+                1: SignExt.out
+            Output:
+                --> ALU.op2
+
+        Mem_to_Reg
+            Type: 2-to-1
+            Bits: 32
+            Inputs:
+                0: ALU.result
+                1: DataMem.read_data
+            Output:
+                --> RegFile.write_data
+    b. Table
