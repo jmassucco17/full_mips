@@ -37,147 +37,151 @@ listing of all commands.
             Opcode/funct:   0x00/0x20
             Syntax:         add rd, rs, rt
             Operation:      R[rd] = R[rs] + R[rt]
-            Notes:
+            Notes:          May cause overflow
 
-        ADDU 
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
-            Notes:
+        ADDU (Add Unsigned)
+            Opcode/funct:   0x00/0x21
+            Syntax:         addu rd, rs, rt
+            Operation:      R[rd] = R[rs] + R[rt]
+            Notes:          
 
-        SUB 
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
-            Notes:
+        SUB (Subtract)
+            Opcode/funct:   0x00/0x22
+            Syntax:         sub rd, rs, rt
+            Operation:      R[rd] = R[rs] - R[rt]
+            Notes:          May cause overflow
 
-        SUBU
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SUBU (Subtract Unsigned)
+            Opcode/funct:   0x00/0x23
+            Syntax:         subu rd, rs, rt
+            Operation:      R[rd] = R[rs] - R[rt]
             Notes:
 
         AND
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+            Opcode/funct:   0x00/0x24
+            Syntax:         and rd, rs, rt
+            Operation:      R[rd] = R[rs] & R[rt]
             Notes:
 
         NOR
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+            Opcode/funct:   0x00/0x27
+            Syntax:         nor rd, rs, rt
+            Operation:      R[rd] = ~(R[rs] | R[rt])
             Notes:
 
         OR
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+            Opcode/funct:   0x00/0x25
+            Syntax:         or rd, rs, rt
+            Operation:      R[rd] = R[rs] | R[rt]
             Notes:
 
-        XOR
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        XOR (Exclusive OR)
+            Opcode/funct:   0x00/0x26
+            Syntax:         xor rd, rs, rt
+            Operation:      R[rd] = R[rs] ^ R[rt]
             Notes:
 
-        SLL
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SLL (Shift Left Logical)
+            Opcode/funct:   0x00/0x00
+            Syntax:         sll rd, rs, shamt
+            Operation:      R[rd] = R[rs] << shamt
             Notes:
 
-        SRL
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SRL (Shift Right Logical)
+            Opcode/funct:   0x00/0x02
+            Syntax:         srl rd, rs, shamt
+            Operation:      R[rd] = R[rs] >> shamt (insert 0)
             Notes:
 
-        SRA
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SRA (Shift Right Arithmetic)
+            Opcode/funct:   0x00/0x03
+            Syntax:         sra rd, rs, shamt
+            Operation:      R[rd] = R[rs] >> shamt (insert sign)
             Notes:
 
-        SLLV
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SLLV (Shift Left Logical Variable)
+            Opcode/funct:   0x00/0x04
+            Syntax:         sllv rd, rs, rt
+            Operation:      R[rd] = R[rs] << R[rt]
             Notes:
 
-        SRLV
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SRLV (Shift Right Logical Variable)
+            Opcode/funct:   0x00/0x06
+            Syntax:         srlv rd, rs, rt
+            Operation:      R[rd] = R[rs] >> R[rt] (insert 0)
             Notes:
 
-        SRAV
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SRAV (Shift Right Arithmetic Variable)
+            Opcode/funct:   0x00/0x07
+            Syntax:         srav rd, rs, rt
+            Operation:      R[rd] = R[rs] >> R[rt] (insert sign)
             Notes:
 
-        SLT
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SLT (Set If Less Than)
+            Opcode/funct:   0x00/0x2A
+            Syntax:         slt rd, rs, rt
+            Operation:      R[rd] = (R[rs] < R[rt]) ? 1 : 0
             Notes:
 
-        SLTU
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SLTU (Set If Less Than Unsigned)
+            Opcode/funct:   0x00/0x2B
+            Syntax:         sltu rd, rs, rt
+            Operation:      R[rd] = (R[rs] < R[rt]) ? 1 : 0
+            Notes:          Operands considered unsigned numbers, not 2's comp
+
+        JR (Jump to Register)
+            Opcode/funct:   0x00/0x08
+            Syntax:         jr rs
+            Operation:      PC = R[rs]
             Notes:
 
-        JR
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        JALR (Jump and Link Register)
+            Opcode/funct:   0x00/0x09
+            Syntax:         jalr rs
+            Operation:      R[31] = PC + 4; PC = R[rs]
             Notes:
 
-        JALR
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        DIV (Divide)
+            Opcode/funct:   0x00/0x1A
+            Syntax:         div rs, rt
+            Operation:      Lo = R[rs] / R[rt]; Hi = R[rs] % R[rt]
             Notes:
 
-        DIV
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        DIVU (Divide Unsigned)
+            Opcode/funct:   0x00/0x1B
+            Syntax:         divu rs, rt
+            Operation:      Lo = R[rs] / R[rt]; Hi = R[rs] % R[rt]
+            Notes:          Operands treated as unsigned, not 2's comp
+
+        MULT (Multiply)
+            Opcode/funct:   0x00/0x18
+            Syntax:         mult rs, rt
+            Operation:      {Hi, Lo} = R[rs] * R[rt]
             Notes:
 
-        DIVU
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        MULTU (Multiply Unsigned)
+            Opcode/funct:   0x00/0x19
+            Syntax:         multu rs, rt
+            Operation:      {Hi, Lo} = R[rs] * R[rt]
+            Notes:          Operands treated as unsigned, not 2's comp
+
+        MFHI (Move From Hi)
+            Opcode/funct:   0x00/0x10
+            Syntax:         mfhi rd
+            Operation:      R[rd] = Hi
             Notes:
 
-        MULT
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        MFLO (Move From Lo)
+            Opcode/funct:   0x00/0x12
+            Syntax:         mflo rd
+            Operation:      R[rd] = Lo
             Notes:
 
-        MULTU
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
+        SYSCALL (System Call)
+            Opcode/funct:   0x00/0x0C
+            Syntax:         syscall
+            Operation:      Request an OS service
             Notes:
-
-        MFHI
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
-            Notes:
-
-        MFLO
-            Opcode/funct:   
-            Syntax:         
-            Operation:      
-            Notes:
-
-            
 
 
     b. I-Type
@@ -186,13 +190,134 @@ listing of all commands.
     | opcode  |   rs    |   rt    |  immediate  |
     | (31:26) | (25:21) | (20:16) |    (15:0)   |
     ---------------------------------------------
-    
+        ADDI (Add Immediate)
+            Opcode/funct:   0x08
+            Syntax:         addi rt, rs, imm
+            Operation:      R[rt] = R[rs] + SignExtImm
+            Notes:          May cause overflow; SignExtImm = {16{imm[15]}, imm}
+
+        ADDIU (Add Immediate Unsigned)
+            Opcode/funct:   0x09
+            Syntax:         addiu rt, rs, imm
+            Operation:      R[rt] = R[rs] + SignExtImm
+            Notes:          SignExtImm = {16{imm[15]}, imm}
+        
+        ANDI (AND Immediate)
+            Opcode/funct:   0x0C
+            Syntax:         andi rt, rs, imm
+            Operation:      R[rt] = R[rs] & ZeroExtImm
+            Notes:          ZeroExtImm = {16{1b'0}, imm}
+ 
+        ORI (OR Immediate)
+            Opcode/funct:   0x0D
+            Syntax:         ori rt, rs, imm
+            Operation:      R[rt] = R[rs] | ZeroExtImm
+            Notes:          ZeroExtImm = {16{1b'0}, imm}
+ 
+        XORI (XOR Immediate)
+            Opcode/funct:   0x0E
+            Syntax:         xori rt, rs, imm
+            Operation:      R[rt] = R[rs] ^ ZeroExtImm
+            Notes:          ZeroExtImm = {16{1b'0}, imm}
+ 
+        SLTI (Set If Less Than Immediate)
+            Opcode/funct:   0x0A
+            Syntax:         slti rt, rs, imm
+            Operation:      R[rt] = (R[rs] < SignExtImm) ? 1 : 0
+            Notes:
+ 
+        SLTIU (Set If Less Than Immediate Unsigned)
+            Opcode/funct:   0x0B
+            Syntax:         sltiu rt, rs, imm
+            Operation:      R[rt] = (R[rs] < SignExtImm) ? 1 : 0
+            Notes:
+ 
+        BEQ (Branch On Equal)
+            Opcode/funct:   0x04
+            Syntax:         beq rs, rt, label
+            Operation:      if (R[rs] == R[rt]) PC = PC + BranchAddr
+            Notes:          BranchAddr = {14{imm[15]}, imm, 2b'0}
+ 
+        BNE (Branch On Not Equal)
+            Opcode/funct:   0x05
+            Syntax:         bne rs, rt, label
+            Operation:      if (R[rs] ~= R[rt]) PC = PC + BranchAddr
+            Notes:
+ 
+        LB (Load Byte)
+            Opcode/funct:   0x20
+            Syntax:         lb rt, offs(rs)
+            Operation:      R[rt] = SignExt(M[R[rs] + SignExtImm](7:0)]
+            Notes:
+ 
+        LBU (Load Byte Unsigned)
+            Opcode/funct:   0x24
+            Syntax:         lbu rt, offs(rs)
+            Operation:      R[rt] = ZeroExt(M[R[rs] + SignExtImm](7:0)]
+            Notes:
+ 
+        LH (Load Halfword)
+            Opcode/funct:   0x21
+            Syntax:         lh rt, offs(rs)
+            Operation:      R[rt] = SignExt(M[R[rs] + SignExtImm](15:0)]
+            Notes:
+ 
+        LHU (Load Halfword Unsigned)
+            Opcode/funct:   0x25
+            Syntax:         lhu rt, offs(rs)
+            Operation:      R[rt] = ZeroExt(M[R[rs] + SignExtImm](15:0)]
+            Notes:
+ 
+        LUI (Load Upper Immediate)
+            Opcode/funct:   0x0F
+            Syntax:         lui rt, imm
+            Operation:      R[rt] = imm << 16
+            Notes:
+ 
+        LW (Load Word)
+            Opcode/funct:   0x23
+            Syntax:         lw rt, offs(rs)
+            Operation:      R[rt] = M[R[rs] + SignExtImm]
+            Notes:
+ 
+        SB (Store Byte)
+            Opcode/funct:   0x28
+            Syntax:         sb rt, offs(rs)
+            Operation:      M[R[rs] + SignExtImm](7:0) = R[rt](7:0)
+            Notes:
+ 
+        SH (Store Halfword)
+            Opcode/funct:   0x29
+            Syntax:         sh rt, offs(rs)
+            Operation:      M[R[rs] + SignExtImm](15:0) = R[rt](15:0)
+            Notes:
+ 
+        SW (Store Word)
+            Opcode/funct:   0x2B
+            Syntax:         sw rt, offs(rs)
+            Operation:      M[R[rs] + SignExtImm] = R[rt]
+            Notes:
+ 
+
     c. J-Type
     Instruction layout: 
     _________________________
     | opcode  |  immediate  |
     | (31:26) |    (25:0)   |
     -------------------------   
+        J
+            Opcode/funct:   0x02
+            Syntax:         j label
+            Operation:      PC = JumpAddr
+            Notes:          JumpAddr = {PC[31:28],address,2'b0}
+
+        JAL
+            Opcode/funct:   0x03
+            Syntax:         jal label
+            Operation:      R[31]=PC+4; PC = JumpAddr
+            Notes:          JumpAddr = {PC[31:28],address,2'b0}
+
+
 
     d. Pseudo-Instructions
 
