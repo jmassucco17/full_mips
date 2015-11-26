@@ -16,7 +16,7 @@ SOURCES = \
 		Main.v
 
 $(EXE): $(SOURCES)
-	iverilog $(SOURCES) -o $(EXE)
+	iverilog -o $(EXE) $(SOURCES)
 
 clean:
 	rm -f $(EXE)
