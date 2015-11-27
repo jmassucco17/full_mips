@@ -7,7 +7,7 @@ SOURCES = \
 		InstructionMemory.v \
 		Adder4.v \
 		Alu.v \
-		SignExtend.v \
+		SignZeroExtend.v \
 		ShiftLeft.v \
 		Adder.v \
 		Mux.v \

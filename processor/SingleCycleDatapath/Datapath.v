@@ -87,11 +87,15 @@ module Datapath(input clock,
 	// ALU MUX
 	wire[31:0] alu_mux_in0;
 	wire[31:0] alu_mux_in1;
+    wire[31:0] alu_mux_in2;
+    wire[31:0] alu_mux_in3;
 	wire[31:0] alu_mux_out;
-	wire alu_mux_sel;
-	Mux32Bit2To1 alu_mux(
+	wire[1:0] alu_mux_sel;
+	Mux32Bit4To1 alu_mux(
 			alu_mux_in0,
 			alu_mux_in1,
+            alu_mux_in2,
+            alu_mux_in3,
 			alu_mux_sel,
 			alu_mux_out);
 	
@@ -101,7 +105,7 @@ module Datapath(input clock,
 	// ALU
 	wire[31:0] alu_op1;
 	wire[31:0] alu_op2;
-	wire[2:0] alu_f;
+	wire[3:0] alu_f;
 	wire[31:0] alu_result;
 	wire alu_zero;
 	Alu alu(alu_op1,
@@ -156,7 +160,33 @@ module Datapath(input clock,
 	
 	// Connections for SignExtend
 	assign sign_extend_in = instruction_memory_instr[15:0];
-	assign alu_mux_in1 = sign_extend_out;
+
+    // ZeroExtend
+    wire[15:0] zero_extend_in;
+    wire[31:0] zero_extend_out;
+    ZeroExtend zero_extend(
+            zero_extend_in,
+            zero_extend_out);
+
+    // Connections for ZeroExtend
+    assign zero_extend_in = instruction_memory_instr[15:0];
+
+    // Zero_Sign_Ext MUX
+    wire[31:0] zero_sign_ext_mux_in0;
+    wire[31:0] zero_sign_ext_mux_in1;
+    wire zero_sign_ext_mux_sel;
+    wire[31:0] zero_sign_ext_mux_out;
+    Mux32Bit2To1 zero_sign_ext_mux(
+            zero_sign_ext_mux_in0,
+            zero_sign_ext_mux_in1,
+            zero_sign_ext_mux_sel,
+            zero_sign_ext_mux_out);
+
+    // Connections for Zero_Sign_Ext MUX
+    assign zero_sign_ext_mux_in0 = sign_extend_out;
+    assign zero_sign_ext_mux_in1 = zero_extend_out;
+
+	assign alu_mux_in1 = zero_sign_ext_mux_out;
 	
 	// ShiftLeft
 	wire[31:0] shift_left_in;
@@ -193,16 +223,28 @@ module Datapath(input clock,
 	assign and_gate_in2 = alu_zero;
 	assign pc_mux_sel = and_gate_out;
 
+    // ZeroExtendShamt
+    wire[4:0] zero_ext_shamt_in;
+    wire[31:0] zero_ext_shamt_out;
+    ZeroExtendShamt zero_ext_shamt(
+            zero_ext_shamt_in,
+            zero_ext_shamt_out);
+
+    // Connections for ZeroExtendShamt
+    assign zero_ext_shamt_in = instruction_memory_instr[10:6];
+    assign alu_mux_in2 = zero_ext_shamt_out;
+
 	// Control unit
 	wire[5:0] control_unit_opcode;
 	wire[5:0] control_unit_funct;
 	wire control_unit_reg_dst;
 	wire control_unit_reg_write;
-	wire control_unit_alu_src;
-	wire[2:0] control_unit_alu_op;
+	wire[1:0] control_unit_alu_src;
+	wire[3:0] control_unit_alu_op;
 	wire control_unit_branch;
 	wire control_unit_mem_write;
 	wire control_unit_mem_to_reg;
+    wire control_unit_zero_sign_ext;
 	ControlUnit control_unit(
 			control_unit_opcode,
 			control_unit_funct,
@@ -212,7 +254,8 @@ module Datapath(input clock,
 			control_unit_alu_op,
 			control_unit_branch,
 			control_unit_mem_write,
-			control_unit_mem_to_reg);
+			control_unit_mem_to_reg,
+            control_unit_zero_sign_ext);
 	
 	// Connections for control unit
 	assign control_unit_opcode = instruction_memory_instr[31:26];

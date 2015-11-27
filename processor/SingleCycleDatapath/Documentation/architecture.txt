@@ -473,6 +473,17 @@ listing of all commands.
             Mult4.out --> Adder.op1
             Adder4.out --> Adder.op2
             Adder.result --> PC.in
+
+    f. Sign/Zero Extend (I-Type Instructions)
+        Hardware:
+            Zero Extend (ZeroExt)
+                Inputs:
+                    in(16)
+                Outputs:
+                    out(32)
+        Connections:
+            InstrMem.instr[15:0] (imm) --> ZeroExt.in
+            ZeroExt.out --> ALU.op2
                 
 3. Control Unit
     a. MUXs
@@ -497,7 +508,7 @@ listing of all commands.
             Bits: 32
             Inputs:
                 0: RegFile.read_data2
-                1: SignExt.out
+                1: Zero_Sign_Ext.out
             Output:
                 --> ALU.op2
 
@@ -509,4 +520,13 @@ listing of all commands.
                 1: DataMem.read_data
             Output:
                 --> RegFile.write_data
+
+        Zero_Sign_Ext
+            Type: 2-to-1
+            Bits: 32
+            Inputs:
+                0: SignExt.out
+                1: ZeroExt.out
+            Output
+                --> ALU_Src.in1
     b. Table

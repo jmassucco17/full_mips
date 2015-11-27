@@ -2,11 +2,12 @@ module ControlUnit(input[5:0] opcode,
 		input[5:0] funct,
 		output reg reg_dst,
 		output reg reg_write,
-		output reg alu_src,
-		output reg[2:0] alu_op,
+		output reg[1:0] alu_src,
+		output reg[3:0] alu_op,
 		output reg branch,
 		output reg mem_write,
-		output reg mem_to_reg);
+		output reg mem_to_reg,
+        output reg zero_sign_ext);
 
 	always @(opcode, funct) begin
 		
@@ -14,11 +15,12 @@ module ControlUnit(input[5:0] opcode,
 		// order to prevent synthesis of sequential logic.
 		reg_dst = 1'bx;
 		reg_write = 1'bx;
-		alu_src = 1'bx;
+		alu_src = 2'bxx;
 		alu_op = 4'bxxxx;
 		branch = 1'bx;
 		mem_write = 1'bx;
 		mem_to_reg = 1'bx;
+        zero_sign_ext = 1'bx;
 
 		// Check opcode
 		case (opcode)
@@ -84,6 +86,45 @@ module ControlUnit(input[5:0] opcode,
                         alu_op = 4'b0101;
                         $display("\tInstruction 'xor'");
                     end
+                    
+                    // sll
+                    6'h0: begin
+                        alu_op = 6;
+                        alu_src = 2;
+                        $display("\tInstruction 'sll'");
+                    end
+
+                    // srl
+                    6'h2: begin
+                        alu_op = 7;
+                        alu_src = 2;
+                        $display("\tInstruction 'srl'");
+                    end
+
+                    // sra
+                    6'h3: begin
+                        alu_op = 8;
+                        alu_src = 2;
+                        $display("\tInstruction 'sra'");
+                    end
+
+                    // sllv
+                    6'h4: begin
+                        alu_op = 6;
+                        $display("\tInstruction 'sllv'");
+                    end
+
+                    // srlv
+                    6'h6: begin
+                        alu_op = 7;
+                        $display("\tInstruction 'srlv'");
+                    end
+
+                    // srav
+                    6'h7: begin
+                        alu_op = 8;
+                        $display("\tInstruction 'srav'");
+                    end
 
 					// slt
 					6'h2a: begin
@@ -108,6 +149,7 @@ module ControlUnit(input[5:0] opcode,
 				branch = 0;
 				mem_write = 0;
 				mem_to_reg = 1;
+                zero_sign_ext = 0;
 				$display("\tInstruction 'lw'");
 			end
 
@@ -118,6 +160,7 @@ module ControlUnit(input[5:0] opcode,
 				alu_op = 4'b0000;
 				branch = 0;
 				mem_write = 1;
+                zero_sign_ext = 0;
 				$display("\tInstruction 'sw'");
 			end
 
