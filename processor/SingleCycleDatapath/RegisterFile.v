@@ -19,8 +19,8 @@ module RegisterFile(input clock,
 				content[i] = 0;
 
 			// Set initial values
-			content[1] = 1;			// $1 = 1
-			content[2] = 2;			// $2 = 2
+			content[1] = 3;			// $1 = 3
+			content[2] = 5;			// $2 = 5
 			content[10] = 32'h10010000;	// $10 = 0x10010000
 		end else if (write) begin
 			content[write_index] = write_data;

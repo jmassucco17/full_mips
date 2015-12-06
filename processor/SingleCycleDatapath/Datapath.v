@@ -67,7 +67,7 @@ module Datapath(input clock,
 	wire[31:0] register_file_read_data2;
 	wire register_file_write;
 	wire[4:0] register_file_write_index;
-	wire[31:0] register_file_write_data;
+	reg[31:0] register_file_write_data;
 	RegisterFile register_file(
 			clock,
 			clear,
@@ -113,11 +113,22 @@ module Datapath(input clock,
 			alu_f,
 			alu_result,
 			alu_zero);
-	
-	// Connections for ALU
+
+	// MULT/DIV ALU Module
+	wire mult_alu_en;
+	wire[31:0] alu_result_hi;
+	wire[31:0] alu_result_lo;
+	Mult_Div_Alu mult_div_alu(alu_op1,
+			alu_op2,
+			alu_f,
+			mult_alu_en,
+			alu_result_hi,
+			alu_result_lo);
+
+	// Connections for ALU(s)
 	assign alu_op1 = register_file_read_data1;
 	assign alu_op2 = alu_mux_out;
-
+	
 	// Data memory
 	wire[31:0] data_memory_address;
 	wire data_memory_write;
@@ -149,7 +160,8 @@ module Datapath(input clock,
 	// Connections for data memory MUX
 	assign data_memory_mux_in0 = alu_result;
 	assign data_memory_mux_in1 = data_memory_read_data;
-	assign register_file_write_data = data_memory_mux_out;
+
+	//assign register_file_write_data = data_memory_mux_out;
 
 	// SignExtend
 	wire[15:0] sign_extend_in;
@@ -244,7 +256,10 @@ module Datapath(input clock,
 	wire control_unit_branch;
 	wire control_unit_mem_write;
 	wire control_unit_mem_to_reg;
-    wire control_unit_zero_sign_ext;
+        wire control_unit_zero_sign_ext;
+	wire control_unit_mult_op;
+	wire control_unit_mfhi;
+	wire control_unit_mflo;
 	ControlUnit control_unit(
 			control_unit_opcode,
 			control_unit_funct,
@@ -255,7 +270,10 @@ module Datapath(input clock,
 			control_unit_branch,
 			control_unit_mem_write,
 			control_unit_mem_to_reg,
-            control_unit_zero_sign_ext);
+            		control_unit_zero_sign_ext,
+			control_unit_mult_op,
+			control_unit_mfhi,
+			control_unit_mflo);
 	
 	// Connections for control unit
 	assign control_unit_opcode = instruction_memory_instr[31:26];
@@ -268,5 +286,15 @@ module Datapath(input clock,
 	assign data_memory_write = control_unit_mem_write;
 	assign data_memory_mux_sel = control_unit_mem_to_reg;
 
-endmodule
+	assign mult_alu_en = control_unit_mult_op;
 
+	// NOTE: it's not possible for mflo and mfhi to both be enabled so this
+	// won't result in a race condition
+	always@(control_unit_mflo, control_unit_mfhi) begin
+		case({control_unit_mflo, control_unit_mfhi})
+			2'b10: register_file_write_data = alu_result_lo; 
+			2'b01: register_file_write_data = alu_result_hi; 
+			default: register_file_write_data = data_memory_mux_out;
+		endcase
+	end
+endmodule

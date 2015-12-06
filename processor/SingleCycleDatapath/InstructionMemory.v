@@ -14,6 +14,7 @@ module InstructionMemory(input clock,
 				content[i] = 0;
 
 			// Initial values
+			/*
 			content[0] = 32'h00221820;	// add $3, $1, $2  <- label 'main'
 			content[1] = 32'h00221822;	// sub $3, $1, $2
 			content[2] = 32'h00221824;	// and $3, $1, $2
@@ -25,6 +26,13 @@ module InstructionMemory(input clock,
 			content[8] = 32'h8d430004;	// lw $3, 4($10)
 			content[9] = 32'had430008;	// sw $3, 8($10)
 			content[10] = 32'h1000fff5;	// beq $0, $0, main
+			*/
+		
+			// MULT TESTING
+			content[0] = 32'h00220018;	// mult $1, $2
+			content[1] = 32'h0041001A;	// div $2, $1
+			content[2] = 32'h00001810;	// mfhi $3
+			content[3] = 32'h00002012;	// mflo $5
 		end
 
 	// Read instruction

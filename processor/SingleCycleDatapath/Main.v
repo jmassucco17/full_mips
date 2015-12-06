@@ -54,6 +54,6 @@ module Main;
 
 	// Run for 11 cycles
 	initial begin
-		#110 $finish;
+		#40 $finish;
 	end
 endmodule
